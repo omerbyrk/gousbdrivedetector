@@ -7,6 +7,7 @@ import (
 	"os"
 	"os/exec"
 	"strings"
+	"syscall"
 )
 
 // Detect returns a list of file paths pointing to the root folder of
@@ -17,7 +18,9 @@ func Detect() ([]string, error) {
 
 	cmd := "wmic"
 	args := []string{"logicaldisk", "where", "drivetype=2", "get", "deviceid"}
-	out, err := exec.Command(cmd, args...).Output()
+	process := exec.Command(cmd, args...)
+	process.SysProcAttr = &syscall.SysProcAttr{HideWindow: true}
+	out, err := process.Output()
 
 	if err != nil {
 		return drives, err
